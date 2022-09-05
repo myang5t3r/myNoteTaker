@@ -60,8 +60,33 @@ app.post('/api/notes', (req, res) => {
         notes.push(newNote);
         fs.writeFile('./db/db.json', JSON.stringify(notes), e => e ? console.log(e) : console.log(`Notes updated`))        
     }
-
    }) 
+})
+
+// DELETE /api/notes/:id should receive a query parameter containing the id of a note to delete. In order to delete a note, you'll need to read all notes from the db.json file, remove the note with the given id property, and then rewrite the notes to the db.json file.
+
+app.delete('/api/notes/:id', (req, res) => {
+    // let client know that the post was received
+    res.json(`${req.method} request was received`);
+
+    // Create empty array to push only items that have not been deleted
+    const persData = [];
+    fs.readFile('./db/db.json', 'utf8', (e, data) => {
+        if (e) {
+            console.log(e);
+        } else {
+            const notes = JSON.parse(data);
+            // Loop through array and delete element if the id mataches the request parameter
+            notes.forEach(element => {
+                // console.log(element.id)
+                if (element.id !== req.params.id){
+                    persData.push(element);
+                }
+            });
+        }
+        // Now write to database
+        fs.writeFile('./db/db.json', JSON.stringify(persData), e => e ? console.log(e) : console.log(`Notes updated`))   
+    })
 })
 
 
